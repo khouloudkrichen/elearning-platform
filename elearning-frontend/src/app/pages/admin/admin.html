@@ -1,0 +1,122 @@
+<div class="admin-layout">
+  <header class="topbar">
+    <div class="logo">E-Learning Admin</div>
+
+    <nav class="nav">
+      <button (click)="setSection('candidatures')" [class.active]="section === 'candidatures'">
+        Candidatures
+      </button>
+
+      <button (click)="setSection('etudiants')" [class.active]="section === 'etudiants'">
+        Étudiants
+      </button>
+
+      <button (click)="setSection('blocked')" [class.active]="section === 'blocked'">
+        Bloqués
+      </button>
+    </nav>
+
+    <div class="right">
+      <button class="logout" (click)="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <!-- SECTION CANDIDATURES -->
+    <div *ngIf="section === 'candidatures'">
+      <h1>Validation des formateurs</h1>
+      <p class="section-subtitle">
+        Consultez les candidatures envoyées par les formateurs et décidez de les accepter ou de les
+        refuser.
+      </p>
+
+      <div *ngIf="loading" class="state-card">Chargement des candidatures...</div>
+
+      <div *ngIf="!loading && errorMessage" class="state-card error">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="!loading && !errorMessage && formateurs.length === 0" class="state-card">
+        Aucune candidature en attente.
+      </div>
+
+      <div class="cards" *ngIf="!loading && !errorMessage && formateurs.length > 0">
+        <div class="card" *ngFor="let f of formateurs">
+          <div class="card-header">
+            <div>
+              <h3>{{ f.nom }}</h3>
+              <p>{{ f.email }}</p>
+            </div>
+            <span class="status">{{ f.status }}</span>
+          </div>
+
+          <div class="info">
+            <p><b>Spécialité :</b> {{ f.specialite || 'Non renseignée' }}</p>
+            <p><b>Portfolio :</b> {{ f.portfolio || 'Non renseigné' }}</p>
+            <p><b>Bio :</b> {{ f.bio || 'Non renseignée' }}</p>
+            <p><b>Motivation :</b> {{ f.motivation || 'Non renseignée' }}</p>
+          </div>
+
+          <div class="files">
+            <a *ngIf="f.cvUrl" [href]="getFileUrl(f.cvUrl)" target="_blank">Ouvrir CV</a>
+            <a *ngIf="f.diplomeUrl" [href]="getFileUrl(f.diplomeUrl)" target="_blank"
+              >Ouvrir Diplôme</a
+            >
+            <a *ngIf="f.certificatUrl" [href]="getFileUrl(f.certificatUrl)" target="_blank"
+              >Ouvrir Certificat</a
+            >
+            <a *ngIf="f.attestationUrl" [href]="getFileUrl(f.attestationUrl)" target="_blank"
+              >Ouvrir Attestation</a
+            >
+          </div>
+
+          <div class="actions">
+            <button class="accept" (click)="accepter(f.id)">Accepter</button>
+            <button class="refuse" (click)="refuser(f.id)">Refuser</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION ETUDIANTS -->
+    <div *ngIf="section === 'etudiants'">
+      <h1>Liste des étudiants</h1>
+      <p class="section-subtitle">Consultez tous les étudiants inscrits sur la plateforme.</p>
+
+      <div *ngIf="loading" class="state-card">Chargement des étudiants...</div>
+
+      <div *ngIf="!loading && errorMessage" class="state-card error">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="!loading && !errorMessage && etudiants.length === 0" class="state-card">
+        Aucun étudiant trouvé.
+      </div>
+
+      <div class="cards" *ngIf="!loading && !errorMessage && etudiants.length > 0">
+        <div class="card" *ngFor="let e of etudiants">
+          <div class="card-header">
+            <div>
+              <h3>{{ e.nom }}</h3>
+              <p>{{ e.email }}</p>
+            </div>
+            <span class="status">{{ e.status }}</span>
+          </div>
+
+          <div class="info">
+            <p><b>ID :</b> {{ e.id }}</p>
+            <p><b>Status :</b> {{ e.status }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION BLOQUES -->
+    <div *ngIf="section === 'blocked'">
+      <h1>Utilisateurs bloqués</h1>
+      <p class="section-subtitle">Cette section sera ajoutée ensuite.</p>
+
+      <div class="state-card">Aucun module de blocage n'est encore connecté.</div>
+    </div>
+  </main>
+</div>

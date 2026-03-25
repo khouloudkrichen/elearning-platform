@@ -1,0 +1,13 @@
+<div class="container">
+  <h2>Candidatures Formateurs</h2>
+
+  <div *ngFor="let f of formateurs" class="card">
+    <h3>{{ f.nom }}</h3>
+    <p>{{ f.email }}</p>
+    <p>{{ f.specialite }}</p>
+    <p>{{ f.motivation }}</p>
+
+    <button (click)="accepter(f.id)">Accepter</button>
+    <button (click)="refuser(f.id)">Refuser</button>
+  </div>
+</div>

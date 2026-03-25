@@ -1,0 +1,103 @@
+package com.elearning.elearning_api.service;
+
+import com.elearning.elearning_api.dto.request.CoursRequest;
+import com.elearning.elearning_api.dto.response.CoursResponse;
+import com.elearning.elearning_api.entity.*;
+import com.elearning.elearning_api.enums.EtatCours;
+import com.elearning.elearning_api.exception.ResourceNotFoundException;
+import com.elearning.elearning_api.repository.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class CoursService {
+
+    private final CoursRepository coursRepository;
+    private final FormateurRepository formateurRepository;
+    private final SousCategorieRepository sousCategorieRepository;
+
+    public CoursResponse create(CoursRequest request) {
+        Formateur formateur = formateurRepository.findById(request.getFormateurId())
+                .orElseThrow(() -> new ResourceNotFoundException("Formateur not found: " + request.getFormateurId()));
+
+        SousCategorie sousCategorie = sousCategorieRepository.findById(request.getSousCategorieId())
+                .orElseThrow(() -> new ResourceNotFoundException("SousCategorie not found: " + request.getSousCategorieId()));
+
+        Cours cours = new Cours();
+        cours.setTitre(request.getTitre());
+        cours.setDescription(request.getDescription());
+        cours.setFormateur(formateur);
+        cours.setSousCategorie(sousCategorie);
+        cours.setEtatPublication(EtatCours.BROUILLON);
+
+        return toResponse(coursRepository.save(cours));
+    }
+
+    public CoursResponse update(Long id, CoursRequest request) {
+        Cours existing = coursRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cours not found: " + id));
+
+        existing.setTitre(request.getTitre());
+        existing.setDescription(request.getDescription());
+
+        if (request.getSousCategorieId() != null) {
+            SousCategorie sousCategorie = sousCategorieRepository.findById(request.getSousCategorieId())
+                    .orElseThrow(() -> new ResourceNotFoundException("SousCategorie not found: " + request.getSousCategorieId()));
+            existing.setSousCategorie(sousCategorie);
+        }
+
+        return toResponse(coursRepository.save(existing));
+    }
+
+    public void delete(Long id) {
+        Cours existing = coursRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cours not found: " + id));
+        existing.setEtatPublication(EtatCours.SUPPRIME);
+        coursRepository.save(existing);
+    }
+
+    public CoursResponse getById(Long id) {
+        return coursRepository.findById(id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Cours not found: " + id));
+    }
+
+    public List<CoursResponse> getAll() {
+        return coursRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    public List<CoursResponse> getByFormateur(Long formateurId) {
+        return coursRepository.findByFormateurId(formateurId)
+                .stream().map(this::toResponse).toList();
+    }
+
+    public List<CoursResponse> getByEtat(EtatCours etat) {
+        return coursRepository.findByEtatPublication(etat)
+                .stream().map(this::toResponse).toList();
+    }
+
+    public CoursResponse updateEtat(Long id, EtatCours etat) {
+        Cours existing = coursRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cours not found: " + id));
+        existing.setEtatPublication(etat);
+        if (etat == EtatCours.PUBLIE)
+            existing.setDatePublication(LocalDateTime.now());
+        return toResponse(coursRepository.save(existing));
+    }
+
+    private CoursResponse toResponse(Cours cours) {
+        CoursResponse response = new CoursResponse();
+        response.setId(cours.getId());
+        response.setTitre(cours.getTitre());
+        response.setDescription(cours.getDescription());
+        response.setEtatPublication(cours.getEtatPublication());
+        response.setDateCreation(cours.getDateCreation());
+        response.setDatePublication(cours.getDatePublication());
+        response.setFormateurNom(cours.getFormateur().getNom());
+        response.setSousCategorieNom(cours.getSousCategorie().getNom());
+        return response;
+    }
+}
