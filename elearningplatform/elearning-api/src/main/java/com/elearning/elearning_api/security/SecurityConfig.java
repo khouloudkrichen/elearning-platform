@@ -38,14 +38,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
-                                "/api/auth/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**",
-                                "/uploads/**"
-                        ).permitAll()
+                        	    "/api/auth/**",
+                        	    "/api/categories/**", 
+                        	    "/swagger-ui.html",
+                        	    "/v3/api-docs/**",
+                        	    "/swagger-resources/**",
+                        	    "/webjars/**",
+                        	    "/uploads/**",
+                        	    "/swagger-ui/**"
+                        	).permitAll()
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/etudiant/**").hasRole("ETUDIANT")
