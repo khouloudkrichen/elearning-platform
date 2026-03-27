@@ -10,6 +10,7 @@ import { TeacherApplication } from './pages/teacher-application/teacher-applicat
 import { TeacherPending } from './pages/teacher-pending/teacher-pending';
 import { AdminFormateurs } from './pages/admin-formateurs/admin-formateurs';
 
+
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },

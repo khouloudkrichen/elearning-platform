@@ -14,6 +14,9 @@
       <button (click)="setSection('blocked')" [class.active]="section === 'blocked'">
         Bloqués
       </button>
+      <button (click)="setSection('categories')" [class.active]="section === 'categories'">
+        Catégories
+      </button>
     </nav>
 
     <div class="right">
@@ -118,5 +121,9 @@
 
       <div class="state-card">Aucun module de blocage n'est encore connecté.</div>
     </div>
+    <app-categories *ngIf="section === 'categories'"></app-categories>
   </main>
+
+
 </div>
+

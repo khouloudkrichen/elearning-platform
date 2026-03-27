@@ -1,4 +1,45 @@
-<div class="container">
-  <h2>Demande envoyée</h2>
-  <p>Votre candidature est en attente de validation par l'administrateur.</p>
+<div class="pending-container">
+  <div class="card">
+    
+    <div class="icon-wrapper">
+      <div class="icon">⏳</div>
+      <div class="icon-pulse"></div>
+    </div>
+
+    <h1>Candidature envoyée</h1>
+
+    <p class="message">
+      Votre candidature a été envoyée avec succès 🎉
+    </p>
+
+    <div class="status">
+      <span class="status-label">Statut :</span>
+      <span class="badge">
+        <span class="badge-dot"></span>
+        En attente
+      </span>
+    </div>
+
+    <div class="info-card">
+      <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <p class="info">
+        L'administrateur examinera votre dossier.<br>
+        Vous serez notifié une fois la décision prise.
+      </p>
+    </div>
+
+    <button class="home-button" (click)="goHome()">
+      <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9L12 3L21 9L12 15L3 9Z"></path>
+        <path d="M12 15V21"></path>
+        <path d="M9 18L12 15L15 18"></path>
+      </svg>
+      Retour à l’accueil
+    </button>
+
+  </div>
 </div>

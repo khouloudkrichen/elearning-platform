@@ -82,6 +82,7 @@ export class TeacherApplication {
     this.formateurService.uploadCandidature(userId, formData).subscribe({
       next: () => {
         this.loading = false;
+        this.router.navigate(['/teacher-pending']);
         this.successMessage = 'Votre candidature a été envoyée avec succès.';
 
         setTimeout(() => {
