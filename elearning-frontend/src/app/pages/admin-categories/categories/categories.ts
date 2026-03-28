@@ -1,7 +1,8 @@
-// categories.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { CategoryService, Categorie } from '../../../services/category';
 import { SousCategories } from '../sous-categories/sous-categories';
 
@@ -17,18 +18,38 @@ export class Categories implements OnInit {
   loading = false;
   errorMessage = '';
 
-  // FORMULAIRE CATÉGORIE
+  // ─── Recherche ─────────────────────────────────────
+  searchQuery = '';
+
+  // ─── Formulaire ajout ──────────────────────────────
+  showForm = false;
   nomCategorie = '';
   descriptionCategorie = '';
-  showForm = false;
 
-  // DELETE CATÉGORIE
+  // ─── Formulaire modification ───────────────────────
+  showEditForm = false;
+  editNom = '';
+  editDescription = '';
+  categoryToEdit: Categorie | null = null;
+
+  // ─── Suppression ───────────────────────────────────
   showDeleteConfirm = false;
   categoryToDelete: Categorie | null = null;
 
-  // SOUS-CATÉGORIES MODAL
+  // ─── Sous-catégories ───────────────────────────────
   showSousCategoriesModal = false;
   selectedCategory: Categorie | null = null;
+
+  private gradients = [
+    'linear-gradient(135deg, #6366f1, #8b5cf6)',
+    'linear-gradient(135deg, #ec4899, #8b5cf6)',
+    'linear-gradient(135deg, #06b6d4, #6366f1)',
+    'linear-gradient(135deg, #f59e0b, #ef4444)',
+    'linear-gradient(135deg, #10b981, #06b6d4)',
+    'linear-gradient(135deg, #f97316, #ec4899)',
+    'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+    'linear-gradient(135deg, #6366f1, #10b981)',
+  ];
 
   constructor(
     private categoryService: CategoryService,
@@ -39,27 +60,100 @@ export class Categories implements OnInit {
     this.loadCategories();
   }
 
+  // ─── Chargement ────────────────────────────────────
   loadCategories(): void {
-  this.loading = true;
+    this.loading = true;
+    this.errorMessage = '';
 
-  this.categoryService.getAll().subscribe({
-    next: (data: Categorie[]) => {
-      console.log("DATA API 👉", data); // 🔥 AJOUTE ÇA
-      this.categories = data;
-      this.loading = false;
-    },
-    error: (err: any) => {
-      console.error("ERREUR API ❌", err); // 🔥 AJOUTE ÇA
-      this.errorMessage = 'Erreur chargement catégories';
-      this.loading = false;
+    this.categoryService.getAll().subscribe({
+      next: (categories: Categorie[]) => {
+        if (categories.length === 0) {
+          this.categories = [];
+          this.loading = false;
+          this.cdr.detectChanges();
+          return;
+        }
+
+        const requests = categories.map(cat =>
+          this.categoryService.getSousCategoriesByCategorieId(cat.id!).pipe(
+            catchError(() => of([]))
+          )
+        );
+
+        forkJoin(requests).subscribe({
+          next: (sousCategoriesArray) => {
+            this.categories = categories.map((cat, index) => ({
+              ...cat,
+              sousCategories: sousCategoriesArray[index]
+            }));
+            this.loading = false;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.categories = [...categories];
+            this.loading = false;
+            this.cdr.detectChanges();
+          }
+        });
+      },
+      error: () => {
+        this.errorMessage = 'Erreur chargement catégories';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // ─── Recherche ─────────────────────────────────────
+  filteredCategories(): Categorie[] {
+    if (!this.searchQuery.trim()) return this.categories;
+    const q = this.searchQuery.toLowerCase().trim();
+    return this.categories.filter(cat =>
+      cat.nom.toLowerCase().includes(q) ||
+      (cat.description || '').toLowerCase().includes(q)
+    );
+  }
+
+  // ─── Stats ─────────────────────────────────────────
+  getTotalSousCategories(): number {
+    return this.categories.reduce((sum, cat) => sum + (cat.sousCategories?.length || 0), 0);
+  }
+
+  getAverage(): string {
+    if (this.categories.length === 0) return '0';
+    return (this.getTotalSousCategories() / this.categories.length).toFixed(1);
+  }
+
+  // ─── Helpers visuels ───────────────────────────────
+  getGradient(index: number): string {
+    return this.gradients[index % this.gradients.length];
+  }
+
+  getCategoryIcon(nom: string): string {
+    const icons: { [key: string]: string } = {
+      'développement': '💻', 'web': '🌐', 'design': '🎨',
+      'marketing': '📈', 'business': '💼', 'langues': '🗣️',
+      'musique': '🎵', 'photo': '📸', 'vidéo': '🎬',
+      'science': '🔬', 'math': '📐', 'santé': '🏥',
+      'sport': '⚽', 'data': '📊', 'ia': '🤖',
+      'sécurité': '🔒', 'cloud': '☁️', 'mobile': '📱',
+    };
+    const lower = nom.toLowerCase();
+    for (const [key, icon] of Object.entries(icons)) {
+      if (lower.includes(key)) return icon;
     }
-  });
-}
+    return '📚';
+  }
 
-  openForm(): void {
-    this.showForm = true;
+  getSousCategoriesCount(category: Categorie): number {
+    return category.sousCategories?.length || 0;
+  }
+
+  // ─── Ajout ─────────────────────────────────────────
+  openAddForm(): void {
     this.nomCategorie = '';
     this.descriptionCategorie = '';
+    this.showForm = true;
   }
 
   closeForm(): void {
@@ -68,32 +162,25 @@ export class Categories implements OnInit {
     this.descriptionCategorie = '';
   }
 
-getSousCategoriesCount(category: Categorie): number {
-  return category.sousCategories?.length || 0;
-}
   addCategory(): void {
     if (!this.nomCategorie.trim()) {
       this.errorMessage = 'Le nom est requis';
       return;
     }
-    
     const newCat: Categorie = {
       nom: this.nomCategorie.trim(),
       description: this.descriptionCategorie.trim() || ''
     };
-
     this.loading = true;
     this.errorMessage = '';
-    
     this.categoryService.create(newCat).subscribe({
-      next: (createdCat: Categorie) => {
-        this.categories.push(createdCat);
+      next: (created: Categorie) => {
+        this.categories = [...this.categories, { ...created, sousCategories: [] }];
         this.closeForm();
         this.loading = false;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        console.error('Erreur ajout:', err);
+      error: () => {
         this.errorMessage = 'Erreur lors de l\'ajout';
         this.loading = false;
         this.cdr.detectChanges();
@@ -101,6 +188,49 @@ getSousCategoriesCount(category: Categorie): number {
     });
   }
 
+  // ─── Modification ──────────────────────────────────
+  openEditForm(category: Categorie): void {
+    this.categoryToEdit = category;
+    this.editNom = category.nom;
+    this.editDescription = category.description || '';
+    this.showEditForm = true;
+  }
+
+  closeEditForm(): void {
+    this.showEditForm = false;
+    this.categoryToEdit = null;
+    this.editNom = '';
+    this.editDescription = '';
+  }
+
+  updateCategory(): void {
+    if (!this.editNom.trim() || !this.categoryToEdit?.id) return;
+
+    const updated: Categorie = {
+      ...this.categoryToEdit,
+      nom: this.editNom.trim(),
+      description: this.editDescription.trim()
+    };
+
+    this.loading = true;
+    this.categoryService.update(this.categoryToEdit.id, updated).subscribe({
+      next: (res: Categorie) => {
+        this.categories = this.categories.map(c =>
+          c.id === res.id ? { ...res, sousCategories: c.sousCategories } : c
+        );
+        this.closeEditForm();
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.errorMessage = 'Erreur lors de la modification';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // ─── Suppression ───────────────────────────────────
   confirmDelete(category: Categorie): void {
     this.categoryToDelete = category;
     this.showDeleteConfirm = true;
@@ -113,17 +243,15 @@ getSousCategoriesCount(category: Categorie): number {
 
   deleteCategory(): void {
     if (!this.categoryToDelete?.id) return;
-    
     this.loading = true;
     this.categoryService.delete(this.categoryToDelete.id).subscribe({
       next: () => {
-        this.categories = this.categories.filter((c: Categorie) => c.id !== this.categoryToDelete?.id);
+        this.categories = this.categories.filter(c => c.id !== this.categoryToDelete?.id);
         this.closeDeleteConfirm();
         this.loading = false;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        console.error('Erreur suppression:', err);
+      error: () => {
         this.errorMessage = 'Erreur lors de la suppression';
         this.loading = false;
         this.closeDeleteConfirm();
@@ -132,6 +260,7 @@ getSousCategoriesCount(category: Categorie): number {
     });
   }
 
+  // ─── Sous-catégories ───────────────────────────────
   openSousCategories(category: Categorie): void {
     this.selectedCategory = category;
     this.showSousCategoriesModal = true;
@@ -143,36 +272,6 @@ getSousCategoriesCount(category: Categorie): number {
   }
 
   onSousCategoriesUpdated(): void {
-    // Recharger les catégories pour mettre à jour le compteur
     this.loadCategories();
   }
-  // Ajoutez cette méthode dans votre classe Categories
-getCategoryIcon(nom: string): string {
-  const icons: { [key: string]: string } = {
-    'Développement': '💻',
-    'Développement Web': '💻',
-    'Web': '🌐',
-    'Design': '🎨',
-    'Marketing': '📈',
-    'Business': '💼',
-    'Langues': '🗣️',
-    'Musique': '🎵',
-    'Photo': '📸',
-    'Vidéo': '🎬',
-    'Science': '🔬',
-    'Mathématiques': '📐',
-    'Santé': '🏥',
-    'Sport': '⚽'
-  };
-  
-  // Chercher une icône correspondante
-  for (const [key, icon] of Object.entries(icons)) {
-    if (nom.toLowerCase().includes(key.toLowerCase())) {
-      return icon;
-    }
-  }
-  
-  // Icône par défaut
-  return '📚';
-}
 }

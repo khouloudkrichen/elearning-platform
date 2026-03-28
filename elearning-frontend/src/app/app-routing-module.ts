@@ -9,18 +9,19 @@ import { Teacher } from './pages/teacher/teacher';
 import { TeacherApplication } from './pages/teacher-application/teacher-application';
 import { TeacherPending } from './pages/teacher-pending/teacher-pending';
 import { AdminFormateurs } from './pages/admin-formateurs/admin-formateurs';
-
+import { Courses } from './pages/admin-cours/admin-cours';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'login', component: Login },
-  { path: 'register', component: Register },
-  { path: 'admin', component: Admin },
-  { path: 'student', component: Student },
-  { path: 'teacher', component: Teacher },
+  { path: '',                  redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login',             component: Login },
+  { path: 'register',          component: Register },
+  { path: 'admin',             component: Admin },
+  { path: 'student',           component: Student },
+  { path: 'teacher',           component: Teacher },
   { path: 'teacher-application', component: TeacherApplication },
-  { path: 'teacher-pending', component: TeacherPending },
-  { path: 'admin-formateurs', component: AdminFormateurs },
+  { path: 'teacher-pending',   component: TeacherPending },
+  { path: 'admin-formateurs',  component: AdminFormateurs },
+  { path: 'admin-cours',       component: Courses },
 ];
 
 @NgModule({

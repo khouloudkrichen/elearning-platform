@@ -143,4 +143,11 @@ export class SousCategories implements OnInit {
   closeModal(): void {
     this.close.emit();
   }
+  get withDescCount(): number {
+  return this.sousCategories.filter(s => s.description?.trim()).length;
+}
+
+get withoutDescCount(): number {
+  return this.sousCategories.filter(s => !s.description?.trim()).length;
+}
 }
