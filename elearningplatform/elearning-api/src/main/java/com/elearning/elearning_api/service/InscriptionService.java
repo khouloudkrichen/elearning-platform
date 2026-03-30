@@ -60,7 +60,7 @@ public class InscriptionService {
     }
 
     public void annuler(Long id) {
-        updateStatut(id, StatutInscription.ANNULE);
+        updateStatut(id, StatutInscription.ANNULE); 
     }
 
     private InscriptionResponse toResponse(Inscription inscription) {
@@ -68,7 +68,9 @@ public class InscriptionService {
         response.setId(inscription.getId());
         response.setDateInscription(inscription.getDateInscription());
         response.setStatut(inscription.getStatut());
+        response.setEtudiantId(inscription.getEtudiant().getId()); 
         response.setEtudiantNom(inscription.getEtudiant().getNom());
+        response.setCoursId(inscription.getCours().getId());
         response.setCoursTitre(inscription.getCours().getTitre());
         return response;
     }

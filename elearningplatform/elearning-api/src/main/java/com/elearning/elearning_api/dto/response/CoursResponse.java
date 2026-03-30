@@ -6,14 +6,31 @@ import java.time.LocalDateTime;
 
 @Data
 public class CoursResponse {
-    private Long id;
-    private String titre;
-    private String description;
-    private EtatCours etatPublication;
+    private Long          id;
+    private String        titre;
+    private String        description;
+    private EtatCours     etatPublication;
     private LocalDateTime dateCreation;
     private LocalDateTime datePublication;
+
+    // Formateur
+    private Long   formateurId;
     private String formateurNom;
-    private Long formateurId;
+    private String formateurEmail;
+
+    // Catégorie ← obligatoire pour le formulaire de modification
+    private Long   categorieId;
+    private String categorieNom;
+
+    // Sous-catégorie
+    private Long   sousCategorieId;
     private String sousCategorieNom;
-    private Long sousCategorieId;
+
+    // Infos supplémentaires
+    private String  duree;
+    private String  niveau;
+    private String  imageUrl;
+    private String  videoUrl;
+    private String  pdfUrl;
+    private Integer nombreInscrits;
 }

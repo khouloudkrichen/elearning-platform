@@ -1,1 +1,680 @@
-<p>student works!</p>
+<div class="student-layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🎓</div>
+      <span>E-Learning</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-label">Navigation</div>
+
+      <a class="nav-item" [class.active]="section === 'dashboard'" (click)="section = 'dashboard'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        Dashboard
+      </a>
+
+      <a class="nav-item" [class.active]="section === 'catalogue'" (click)="section = 'catalogue'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 4H20V16H4V4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M4 9H20M9 4V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Catalogue
+        <span class="nav-count">{{ catalogue.length }}</span>
+      </a>
+
+      <a class="nav-item" [class.active]="section === 'mesCours'" (click)="section = 'mesCours'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Mes cours
+        <span class="nav-count">{{ mesCours.length }}</span>
+      </a>
+
+      <a class="nav-item" [class.active]="section === 'profil'" (click)="section = 'profil'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M4 20c0-3.31 3.58-6 8-6s8 2.69 8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Mon profil
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">{{ initiales }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ nomEtudiant }}</div>
+          <div class="user-email">{{ emailEtudiant }}</div>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="logout()" title="Déconnexion">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main-content">
+
+
+    <!-- ══ DASHBOARD ══ -->
+    <ng-container *ngIf="section === 'dashboard'">
+      <div class="page-header">
+        <div>
+          <h1>Bonjour, {{ nomEtudiant }} 👋</h1>
+          <p class="page-sub">Voici un aperçu de votre activité d'apprentissage</p>
+        </div>
+      </div>
+
+      <!-- KPI -->
+      <div class="kpi-grid">
+        <div class="kpi-card" style="--kpi-color:#6366f1;--kpi-light:#eef2ff">
+          <div class="kpi-icon">📚</div>
+          <div class="kpi-val">{{ totalInscrits }}</div>
+          <div class="kpi-lbl">Cours suivis</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#10b981;--kpi-light:#d1fae5">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-val">{{ coursActifs }}</div>
+          <div class="kpi-lbl">Cours actifs</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#f59e0b;--kpi-light:#fef3c7">
+          <div class="kpi-icon">⏳</div>
+          <div class="kpi-val">{{ coursEnAttente }}</div>
+          <div class="kpi-lbl">En attente</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#06b6d4;--kpi-light:#ecfeff">
+          <div class="kpi-icon">🌍</div>
+          <div class="kpi-val">{{ catalogue.length }}</div>
+          <div class="kpi-lbl">Cours disponibles</div>
+        </div>
+      </div>
+
+      <!-- Derniers cours inscrits -->
+      <div class="section-card" *ngIf="mesCours.length > 0">
+        <div class="section-head">
+          <h3>Mes dernières inscriptions</h3>
+          <button class="btn-link" (click)="section = 'mesCours'">Voir tout →</button>
+        </div>
+        <div class="inscriptions-list">
+          <div *ngFor="let i of mesCours.slice(0, 3)" class="insc-row">
+            <div class="insc-icon">📚</div>
+            <div class="insc-info">
+              <div class="insc-titre">{{ i.coursTitre }}</div>
+              <div class="insc-date" *ngIf="i.dateInscription">{{ i.dateInscription | date:'dd/MM/yyyy' }}</div>
+            </div>
+            <span class="statut-pill" [ngClass]="getStatutClass(i.statut)">{{ getStatutLabel(i.statut) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cours recommandés -->
+      <div class="section-card" *ngIf="catalogue.length > 0">
+        <div class="section-head">
+          <h3>Formations disponibles</h3>
+          <button class="btn-link" (click)="section = 'catalogue'">Voir tout →</button>
+        </div>
+        <div class="mini-grid">
+          <div *ngFor="let c of catalogue.slice(0, 3)" class="mini-card"
+               [style.--grad]="getBannerGradient(c.categorieId)">
+            <div class="mini-banner" [style.background]="getBannerGradient(c.categorieId)">
+              <img *ngIf="c.imageUrl" [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'http://localhost:8081' + c.imageUrl"
+                class="mini-img" (error)="$any($event.target).style.display='none'"/>
+              <span *ngIf="!c.imageUrl" class="mini-emoji">{{ getIcon(c.categorieNom) }}</span>
+            </div>
+            <div class="mini-body">
+              <div class="mini-titre">{{ c.titre }}</div>
+              <div class="mini-formateur">{{ c.formateurNom }}</div>
+              <button *ngIf="!isInscrit(c.id)" class="btn-inscrire-sm" (click)="ouvrirConfirmInscrit(c)">S'inscrire</button>
+              <span *ngIf="isInscrit(c.id)" class="badge-inscrit">✅ Inscrit</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ══ CATALOGUE ══ -->
+    <ng-container *ngIf="section === 'catalogue'">
+      <div class="page-header">
+        <div>
+          <h1>Catalogue des formations</h1>
+          <p class="page-sub">{{ catalogue.length }} formation(s) disponible(s)</p>
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div *ngIf="inscriptionSuccess" class="alert-success">✅ {{ inscriptionSuccess }}</div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+            <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input type="text" class="search-input" [(ngModel)]="searchQuery" placeholder="Rechercher…"/>
+          <button *ngIf="searchQuery" class="search-clear" (click)="searchQuery = ''">✕</button>
+        </div>
+        <select class="filter-select" [(ngModel)]="filterCat">
+          <option value="">Toutes catégories</option>
+          <option *ngFor="let cat of getCategories()" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <!-- Grid -->
+      <div class="cours-grid" *ngIf="filteredCatalogue().length > 0">
+        <div *ngFor="let c of filteredCatalogue(); let i = index"
+             class="cours-card" [style.--delay]="i * 60 + 'ms'">
+
+          <div class="card-banner" [style.background]="getBannerGradient(c.categorieId)">
+            <img *ngIf="c.imageUrl"
+              [src]="c.imageUrl.startsWith('http') ? c.imageUrl : 'http://localhost:8081' + c.imageUrl"
+              class="card-banner-img" (error)="$any($event.target).style.display='none'"/>
+            <div class="card-emoji" [class.hidden]="c.imageUrl">{{ getIcon(c.categorieNom) }}</div>
+            <span *ngIf="isInscrit(c.id)" class="badge-inscrit-card">✅ Inscrit</span>
+          </div>
+
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="chip-cat">{{ c.categorieNom }}</span>
+              <span class="chip-sous" *ngIf="c.sousCategorieNom">{{ c.sousCategorieNom }}</span>
+              <span class="chip-niveau" *ngIf="c.niveau">{{ c.niveau }}</span>
+            </div>
+            <h3 class="card-titre">{{ c.titre }}</h3>
+            <p class="card-desc">{{ c.description || 'Aucune description.' }}</p>
+            <div class="card-formateur">
+              <div class="formateur-avatar">{{ getInitiales(c.formateurNom) }}</div>
+              <span>{{ c.formateurNom }}</span>
+            </div>
+            <div class="card-duree" *ngIf="c.duree">⏱ {{ c.duree }}</div>
+          </div>
+
+          <div class="card-footer">
+            <button *ngIf="!isInscrit(c.id)" class="btn-inscrire" (click)="ouvrirConfirmInscrit(c)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+              S'inscrire
+            </button>
+            <span *ngIf="isInscrit(c.id)" class="already-inscrit">✅ Déjà inscrit</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="filteredCatalogue().length === 0" class="empty-state">
+        <div class="empty-emoji">🔍</div>
+        <h3>Aucun résultat</h3>
+        <p>Aucune formation ne correspond à votre recherche.</p>
+      </div>
+    </ng-container>
+
+    <!-- ══ MES COURS ══ -->
+    <ng-container *ngIf="section === 'mesCours'">
+      <div class="page-header">
+        <div>
+          <h1>Mes inscriptions</h1>
+          <p class="page-sub">{{ mesCours.length }} inscription(s)</p>
+        </div>
+      </div>
+
+      <div *ngIf="mesCours.length === 0" class="empty-state">
+        <div class="empty-emoji">📭</div>
+        <h3>Aucune inscription</h3>
+        <p>Vous n'êtes inscrit à aucun cours pour le moment.</p>
+        <button class="btn-primary" (click)="section = 'catalogue'">Découvrir le catalogue</button>
+      </div>
+
+      <div class="mesCours-grid" *ngIf="mesCours.length > 0">
+        <div *ngFor="let i of mesCours; let idx = index" class="mesCours-card" [style.--delay]="idx * 60 + 'ms'">
+          <div class="mesCours-header">
+            <div class="mesCours-icon">📚</div>
+            <div class="mesCours-info">
+              <div class="mesCours-titre">{{ i.coursTitre }}</div>
+              <div class="mesCours-date" *ngIf="i.dateInscription">
+                Inscrit le {{ i.dateInscription | date:'dd/MM/yyyy' }}
+              </div>
+            </div>
+            <span class="statut-pill" [ngClass]="getStatutClass(i.statut)">{{ getStatutLabel(i.statut) }}</span>
+          </div>
+          <div class="mesCours-footer" *ngIf="i.statut !== 'ANNULE' && i.statut !== 'REFUSE'">
+            <button *ngIf="i.statut === 'VALIDE'" class="btn-acceder" (click)="ouvrirCours(i)">
+              📖 Accéder au cours
+            </button>
+            <button class="btn-annuler" (click)="ouvrirConfirmAnnuler(i)">
+              Annuler l'inscription
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ══ PROFIL ══ -->
+    <ng-container *ngIf="section === 'profil'">
+      <div class="page-header">
+        <div>
+          <h1>Mon profil</h1>
+          <p class="page-sub">Vos informations personnelles</p>
+        </div>
+      </div>
+
+      <div class="profil-card">
+        <div class="profil-hero">
+          <div class="profil-avatar">{{ initiales }}</div>
+          <div>
+            <h2>{{ nomEtudiant }}</h2>
+            <p>{{ emailEtudiant }}</p>
+            <span class="badge-role">👨‍🎓 Étudiant</span>
+          </div>
+        </div>
+        <div class="profil-stats">
+          <div class="profil-stat">
+            <div class="profil-stat-val">{{ totalInscrits }}</div>
+            <div class="profil-stat-lbl">Cours suivis</div>
+          </div>
+          <div class="profil-stat">
+            <div class="profil-stat-val">{{ coursActifs }}</div>
+            <div class="profil-stat-lbl">Cours actifs</div>
+          </div>
+          <div class="profil-stat">
+            <div class="profil-stat-val">{{ catalogue.length }}</div>
+            <div class="profil-stat-lbl">Disponibles</div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    
+
+    <!-- ══ CONTENU DU COURS ══ -->
+    <ng-container *ngIf="section === 'cours' && coursActif">
+
+      <!-- Header compact -->
+      <div class="cours-breadcrumb" style="margin-bottom:16px">
+        <button class="btn-back" (click)="section = 'mesCours'">← Mes cours</button>
+        <span>/</span>
+        <span class="bc-titre">{{ coursActif.titre }}</span>
+      </div>
+
+      <!-- Deux colonnes : leçons + contenu -->
+      <div class="cours-layout">
+
+        <!-- ── Sidebar leçons ── -->
+        <div class="lecons-sidebar">
+          <div class="lecons-sidebar-head">
+            <h3>📖 Leçons</h3>
+          </div>
+          <div *ngIf="leconLoading" class="state-mini">
+            <div class="spinner-sm"></div><span>Chargement…</span>
+          </div>
+          <div *ngIf="!leconLoading && lecons.length === 0" class="state-mini">
+            Aucune leçon disponible
+          </div>
+          <div class="lecons-nav" *ngIf="!leconLoading && lecons.length > 0">
+            <div *ngFor="let l of lecons"
+                 class="lecon-nav-item"
+                 [class.active]="leconActive?.id === l.id"
+                 (click)="selectionnerLecon(l)">
+              <div class="lecon-ordre">{{ l.ordre }}</div>
+              <div class="lecon-nav-titre">{{ l.titre }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Contenu principal ── -->
+        <div class="cours-main">
+
+          <!-- Pas de leçon sélectionnée -->
+          <div *ngIf="!leconActive" class="cours-welcome">
+            <div class="cours-banner" [style.background]="getBannerGradient(coursActif.categorieId)">
+              <div class="cours-banner-emoji">{{ getIcon(coursActif.categorieNom) }}</div>
+            </div>
+            <div class="cours-welcome-body">
+              <h2>{{ coursActif.titre }}</h2>
+              <p>{{ coursActif.description }}</p>
+              <div class="cours-meta-chips">
+                <span *ngIf="coursActif.duree" class="chip-info">⏱ {{ coursActif.duree }}</span>
+                <span *ngIf="coursActif.niveau" class="chip-info">🎯 {{ coursActif.niveau }}</span>
+                <span class="chip-info">📖 {{ lecons.length }} leçon(s)</span>
+              </div>
+
+              <!-- Vidéo du cours -->
+              <div *ngIf="coursActif.videoUrl" class="media-section">
+                <h4>🎬 Vidéo du cours</h4>
+                <div *ngIf="isYoutube(coursActif.videoUrl)" class="video-wrap">
+                  <iframe [src]="getYoutubeEmbed(coursActif.videoUrl)"
+                    frameborder="0" allowfullscreen class="video-iframe"></iframe>
+                </div>
+                <a *ngIf="!isYoutube(coursActif.videoUrl)" [href]="coursActif.videoUrl"
+                   target="_blank" class="media-link">▶️ Voir la vidéo →</a>
+              </div>
+
+              <!-- PDF du cours -->
+              <div *ngIf="coursActif.pdfUrl" class="media-section">
+                <h4>📄 Support de cours (PDF)</h4>
+                <div class="pdf-viewer-wrap">
+                  <iframe [src]="getPdfUrl(coursActif.pdfUrl)"
+                    class="pdf-viewer" frameborder="0"></iframe>
+                </div>
+                <a [href]="coursActif.pdfUrl" target="_blank" class="btn-dl-pdf">
+                  ⬇️ Télécharger le PDF
+                </a>
+              </div>
+
+              <button *ngIf="lecons.length > 0" class="btn-start"
+                (click)="selectionnerLecon(lecons[0])">
+                Commencer la première leçon →
+              </button>
+            </div>
+          </div>
+
+          <!-- Leçon sélectionnée -->
+          <div *ngIf="leconActive">
+            <div class="lecon-header">
+              <button class="btn-back-sm" (click)="retourLecons()">← Retour</button>
+              <div>
+                <h2>{{ leconActive.titre }}</h2>
+                <p *ngIf="leconActive.description" class="lecon-desc">{{ leconActive.description }}</p>
+              </div>
+            </div>
+
+            <!-- ── Quiz / Évaluations ── -->
+            <div class="quiz-section">
+
+              <!-- Liste des quiz -->
+              <ng-container *ngIf="quizVue === 'liste'">
+                <div *ngIf="evaluations.length === 0" class="state-mini muted">
+                  Aucun quiz pour cette leçon.
+                </div>
+                <div class="quiz-cards" *ngIf="evaluations.length > 0">
+                  <div *ngFor="let e of evaluations" class="quiz-card-student">
+                    <div class="quiz-card-left">
+                      <span class="quiz-type-badge" [class.examen]="e.type === 'EXAMEN'">
+                        {{ e.type === 'QUIZ' ? '📝 Quiz' : '📋 Examen' }}
+                      </span>
+                      <h4>{{ e.titre }}</h4>
+                      <div class="quiz-infos">
+                        <span>❓ {{ e.questions.length }} questions</span>
+                        <span>✅ Réussite : {{ e.noteMin }}/{{ e.noteMax }}</span>
+                        <span>⏱ {{ e.questions.length * 2 }} min</span>
+                      </div>
+                    </div>
+                    <button class="btn-start-quiz" (click)="commencerQuiz(e)">
+                      Commencer →
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- Passage du quiz -->
+              <ng-container *ngIf="quizVue === 'passage'">
+                <!-- Loading questions -->
+                <div *ngIf="quizLoading" class="state-mini" style="padding:40px;justify-content:center">
+                  <div class="spinner-sm"></div>
+                  <span>Chargement du quiz…</span>
+                </div>
+
+                <div *ngIf="!quizLoading && evalActive" class="quiz-passage">
+                  <!-- Header timer -->
+                  <div class="quiz-pass-header">
+                    <div class="quiz-pass-titre">{{ evalActive.titre }}</div>
+                    <div class="quiz-timer" [class.danger]="timerDanger">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                      </svg>
+                      {{ timerMin }}:{{ timerSec }}
+                    </div>
+                  </div>
+
+                  <!-- Barre de progression timer -->
+                  <div class="timer-bar">
+                    <div class="timer-fill" [style.width]="timerPct + '%'" [class.danger]="timerDanger"></div>
+                  </div>
+
+                  <!-- Questions -->
+                  <div class="questions-quiz">
+                    <div *ngFor="let q of evalActive.questions; let qi = index" class="q-card">
+                      <div class="q-num-label">Question {{ qi + 1 }} / {{ evalActive.questions.length }}</div>
+                      <div class="q-enonce">{{ q.enonce }}</div>
+                      <div class="q-points-badge">{{ q.point }} pt(s)</div>
+                      <div class="choix-quiz">
+                        <div *ngFor="let c of q.choix"
+                             class="choix-quiz-item"
+                             [class.selected]="getReponseChoisie(q.id) === c.id"
+                             (click)="choisirReponse(q.id, c.id)">
+                          <div class="choix-radio" [class.selected]="getReponseChoisie(q.id) === c.id">
+                            <div class="choix-radio-inner" *ngIf="getReponseChoisie(q.id) === c.id"></div>
+                          </div>
+                          <span>{{ c.texte }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="quiz-pass-footer">
+                    <span class="reponses-count">
+                      {{ reponsesEtudiant.size }} / {{ evalActive.questions.length }} réponses
+                    </span>
+                    <button class="btn-soumettre" (click)="soumettreQuiz()">
+                      Soumettre le quiz →
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- Résultat -->
+              <ng-container *ngIf="quizVue === 'resultat'">
+                <div class="quiz-resultat">
+                  <!-- Succès -->
+                  <div *ngIf="quizReussi" class="resultat-success">
+                    <div class="resultat-emoji">🎉</div>
+                    <h3>Félicitations !</h3>
+                    <p>Vous avez réussi le quiz avec <strong>{{ scorePct }}%</strong></p>
+                    <div class="score-ring success">
+                      <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#e8e6ff" stroke-width="8"/>
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#10b981" stroke-width="8"
+                          [attr.stroke-dasharray]="scorePct * 2.638 + ' 263.8'"
+                          stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                      </svg>
+                      <div class="score-ring-text">{{ scorePct }}%</div>
+                    </div>
+                    <div class="score-details">
+                      <span>{{ scoreObtenu }} / {{ scoreTotal }} points</span>
+                    </div>
+                    <!-- Certificat -->
+                    <div class="certificat-card">
+                      <div class="cert-icon">🎓</div>
+                      <div>
+                        <div class="cert-titre">Certificat de réussite</div>
+                        <div class="cert-sous">{{ coursActif.titre }}</div>
+                      </div>
+                      <button class="btn-cert">Télécharger 📄</button>
+                    </div>
+                  </div>
+
+                  <!-- Échec -->
+                  <div *ngIf="!quizReussi" class="resultat-fail">
+                    <div class="resultat-emoji">😔</div>
+                    <h3>Quiz non réussi</h3>
+                    <p>Vous avez obtenu <strong>{{ scorePct }}%</strong> — il faut {{ evalActive!.noteMin }}/{{ evalActive!.noteMax }} pour réussir.</p>
+                    <div class="score-ring fail">
+                      <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#e8e6ff" stroke-width="8"/>
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#ef4444" stroke-width="8"
+                          [attr.stroke-dasharray]="scorePct * 2.638 + ' 263.8'"
+                          stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                      </svg>
+                      <div class="score-ring-text">{{ scorePct }}%</div>
+                    </div>
+                    <div class="score-details"><span>{{ scoreObtenu }} / {{ scoreTotal }} points</span></div>
+                    <button class="btn-retry" (click)="recommencerQuiz()">🔄 Réessayer</button>
+                  </div>
+
+                  <button class="btn-back-quiz" (click)="retourQuizListe()">← Retour aux quiz</button>
+                </div>
+              </ng-container>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+  </main>
+</div>
+
+<!-- ══ MODAL INSCRIPTION ══ -->
+<div *ngIf="showConfirmInscrit" class="overlay" (click)="annulerConfirmInscrit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🎓</div>
+    <h3>S'inscrire à cette formation ?</h3>
+    <p><strong>{{ showConfirmInscrit.titre }}</strong><br>
+    <span class="modal-sub">par {{ showConfirmInscrit.formateurNom }}</span></p>
+    <div class="modal-note">✦ Votre inscription sera examinée</div>
+    <div *ngIf="inscriptionError" class="modal-error">⚠️ {{ inscriptionError }}</div>
+    <div class="confirm-footer">
+      <button class="cf-cancel" (click)="annulerConfirmInscrit()">Annuler</button>
+      <button class="cf-confirm cf-inscrire" (click)="confirmerInscription()" [disabled]="inscriptionLoading">
+        <span class="btn-spinner" *ngIf="inscriptionLoading"></span>
+        {{ inscriptionLoading ? 'Envoi…' : "S'inscrire" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ANNULATION ══ -->
+<div *ngIf="showConfirmAnnuler" class="overlay" (click)="annulerConfirmAnnuler()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🚫</div>
+    <h3>Annuler cette inscription ?</h3>
+    <p><strong>{{ showConfirmAnnuler.coursTitre }}</strong></p>
+    <div class="modal-note warn">⚠️ Cette action est irréversible</div>
+    <div class="confirm-footer">
+      <button class="cf-cancel" (click)="annulerConfirmAnnuler()">Garder</button>
+      <button class="cf-confirm cf-annuler" (click)="confirmerAnnulation()" [disabled]="inscriptionLoading">
+        <span class="btn-spinner" *ngIf="inscriptionLoading"></span>
+        {{ inscriptionLoading ? 'Annulation…' : 'Confirmer' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ MODAL INSCRIPTION ══ -->
+<div *ngIf="showConfirmInscrit" class="overlay" (click)="annulerConfirmInscrit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🎓</div>
+    <h3>S'inscrire à cette formation ?</h3>
+    <p><strong>{{ showConfirmInscrit.titre }}</strong><br>
+    <span class="modal-sub">par {{ showConfirmInscrit.formateurNom }}</span></p>
+    <div class="modal-note">✦ Votre inscription sera examinée</div>
+    <div *ngIf="inscriptionError" class="modal-error">⚠️ {{ inscriptionError }}</div>
+    <div class="confirm-footer">
+      <button class="cf-cancel" (click)="annulerConfirmInscrit()">Annuler</button>
+      <button class="cf-confirm cf-inscrire" (click)="confirmerInscription()" [disabled]="inscriptionLoading">
+        <span class="btn-spinner" *ngIf="inscriptionLoading"></span>
+        {{ inscriptionLoading ? 'Envoi…' : "S'inscrire" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ANNULATION ══ -->
+<div *ngIf="showConfirmAnnuler" class="overlay" (click)="annulerConfirmAnnuler()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🚫</div>
+    <h3>Annuler cette inscription ?</h3>
+    <p><strong>{{ showConfirmAnnuler.coursTitre }}</strong></p>
+    <div class="modal-note warn">⚠️ Cette action est irréversible</div>
+    <div class="confirm-footer">
+      <button class="cf-cancel" (click)="annulerConfirmAnnuler()">Garder</button>
+      <button class="cf-confirm cf-annuler" (click)="confirmerAnnulation()" [disabled]="inscriptionLoading">
+        <span class="btn-spinner" *ngIf="inscriptionLoading"></span>
+        {{ inscriptionLoading ? 'Annulation…' : 'Confirmer' }}
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ══ MODAL INSCRIPTION ══ -->
+<div *ngIf="showConfirmInscrit" class="overlay" (click)="annulerConfirmInscrit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🎓</div>
+    <h3>S'inscrire à cette formation ?</h3>
+    <p><strong>{{ showConfirmInscrit.titre }}</strong><br>
+    <span class="modal-sub">par {{ showConfirmInscrit.formateurNom }}</span></p>
+    <div class="modal-note">✦ Votre inscription sera examinée</div>
+    <div *ngIf="inscriptionError" class="modal-error">⚠️ {{ inscriptionError }}</div>
+    <div class="confirm-footer">
+      <button class="cf-cancel" (click)="annulerConfirmInscrit()">Annuler</button>
+      <button class="cf-confirm cf-inscrire" (click)="confirmerInscription()" [disabled]="inscriptionLoading">
+        <span class="btn-spinner" *ngIf="inscriptionLoading"></span>
+        {{ inscriptionLoading ? 'Envoi…' : "S'inscrire" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ANNULATION ══ -->
+<div *ngIf="showConfirmAnnuler" class="overlay" (click)="annulerConfirmAnnuler()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🚫</div>
+    <h3>Annuler cette inscription ?</h3>
+    <p><strong>{{ showConfirmAnnuler.coursTitre }}</strong></p>
+    <div class="modal-note warn">⚠️ Cette action est irréversible</div>
+    <div class="confirm-footer">
+      <button class="cf-cancel" (click)="annulerConfirmAnnuler()">Garder</button>
+      <button class="cf-confirm cf-annuler" (click)="confirmerAnnulation()" [disabled]="inscriptionLoading">
+        <span class="btn-spinner" *ngIf="inscriptionLoading"></span>
+        {{ inscriptionLoading ? 'Annulation…' : 'Confirmer' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ MODAL INSCRIPTION ══ -->
+<div *ngIf="showConfirmInscrit" class="overlay" (click)="annulerConfirmInscrit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🎓</div>
+    <h3>S'inscrire à cette formation ?</h3>
+    <p><strong>{{ showConfirmInscrit.titre }}</strong><br>
+    <span class="modal-sub">par {{ showConfirmInscrit.formateurNom }}</span></p>
+    <div class="modal-note">✦ Votre inscription sera examinée</div>
+    <div *ngIf="inscriptionError" class="modal-error">⚠️ {{ inscriptionError }}</div>
+    <div class="confirm-footer">
+      <button class="cf-cancel" (click)="annulerConfirmInscrit()">Annuler</button>
+      <button class="cf-confirm cf-inscrire" (click)="confirmerInscription()" [disabled]="inscriptionLoading">
+        <span class="btn-spinner" *ngIf="inscriptionLoading"></span>
+        {{ inscriptionLoading ? 'Envoi…' : "S'inscrire" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ANNULATION ══ -->
+<div *ngIf="showConfirmAnnuler" class="overlay" (click)="annulerConfirmAnnuler()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon">🚫</div>
+    <h3>Annuler cette inscription ?</h3>
+    <p><strong>{{ showConfirmAnnuler.coursTitre }}</strong></p>
+    <div class="modal-note warn">⚠️ Cette action est irréversible</div>
+    <div class="confirm-footer">
+      <button class="cf-cancel" (click)="annulerConfirmAnnuler()">Garder</button>
+      <button class="cf-confirm cf-annuler" (click)="confirmerAnnulation()" [disabled]="inscriptionLoading">
+        <span class="btn-spinner" *ngIf="inscriptionLoading"></span>
+        {{ inscriptionLoading ? 'Annulation…' : 'Confirmer' }}
+      </button>
+    </div>
+  </div>
+</div>

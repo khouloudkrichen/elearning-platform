@@ -1,4 +1,4 @@
-// cSpell:ignore formateur etudiant abonnement
+// cSpell:ignore BROUILLON ATTENTE VALIDATION SUPPRIME  formateur etudiant abonnement
 
 import { Component, OnInit, ChangeDetectorRef, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -90,9 +90,9 @@ export class AdminDashboard implements OnInit, AfterViewInit {
       next: (data: Cours[]) => {
         this.allCours          = data;
         this.stats.totalCours  = data.length;
-        this.stats.coursPublies    = data.filter((c: Cours) => c.statut === 'PUBLIE').length;
-        this.stats.coursEnAttente  = data.filter((c: Cours) => c.statut === 'EN_ATTENTE').length;
-        this.stats.coursValides    = data.filter((c: Cours) => c.statut === 'VALIDE').length;
+        this.stats.coursPublies    = data.filter((c: Cours) => c.etatPublication === 'PUBLIE').length;
+        this.stats.coursEnAttente  = data.filter((c: Cours) => c.etatPublication === 'EN_ATTENTE_VALIDATION').length;
+        this.stats.coursValides    = data.filter((c: Cours) => c.etatPublication === 'EN_ATTENTE_VALIDATION').length;
         this.derniersCours     = [...data].reverse().slice(0, 5);
         check();
       },
@@ -280,15 +280,15 @@ export class AdminDashboard implements OnInit, AfterViewInit {
   // ── Helpers ───────────────────────────────────────────
 
   getStatutLabel(statut: EtatCours): string {
-    const labels: Record<EtatCours, string> = {
-      EN_ATTENTE: 'En attente', VALIDE: 'Validé', PUBLIE: 'Publié', RETIRE: 'Retiré'
+    const labels: Record<string, string> = {
+      BROUILLON: 'Brouillon', EN_ATTENTE_VALIDATION: 'En attente', PUBLIE: 'Publié', SUPPRIME: 'Supprimé'
     };
     return labels[statut] ?? statut;
   }
 
   getStatutClass(statut: EtatCours): string {
-    const classes: Record<EtatCours, string> = {
-      EN_ATTENTE: 'attente', VALIDE: 'valide', PUBLIE: 'publie', RETIRE: 'retire'
+    const classes: Record<string, string> = {
+      BROUILLON: 'brouillon', EN_ATTENTE_VALIDATION: 'attente', PUBLIE: 'publie', SUPPRIME: 'supprime'
     };
     return classes[statut] ?? '';
   }

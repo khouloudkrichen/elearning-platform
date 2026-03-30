@@ -15,10 +15,12 @@ $border-2:  #c7d2fe;
 
 // ── Layout ────────────────────────────────────────────
 .dashboard {
+  overflow-x: hidden;
+  box-sizing: border-box;
   font-family: 'Plus Jakarta Sans', sans-serif;
   background: $bg;
   min-height: 100vh;
-  padding: 32px 36px;
+  padding: 20px 24px;
   position: relative;
 
   &::before {
@@ -66,7 +68,7 @@ h1 {
 // ── Loading skeleton ──────────────────────────────────
 .dash-loading { animation: fadeUp .4s ease; }
 .loading-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; gap: 16px;
 }
 .skeleton-card {
   height: 110px; border-radius: 18px;
@@ -91,7 +93,7 @@ h1 {
   background: $surface;
   border: 1.5px solid $border;
   border-radius: 20px;
-  padding: 20px 22px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -185,7 +187,7 @@ h1 {
   background: $surface;
   border: 1.5px solid $border;
   border-radius: 20px;
-  padding: 22px 24px;
+  padding: 20px 24px;
   animation: fadeUp .45s ease both;
   transition: box-shadow .2s;
   &:hover { box-shadow: 0 8px 28px rgba(99,102,241,.08); }
@@ -231,7 +233,7 @@ h1 {
   background: $surface;
   border: 1.5px solid $border;
   border-radius: 20px;
-  padding: 20px 22px;
+  padding: 16px 18px;
   animation: fadeUp .45s ease both;
   display: flex; flex-direction: column; gap: 16px;
   transition: box-shadow .2s;

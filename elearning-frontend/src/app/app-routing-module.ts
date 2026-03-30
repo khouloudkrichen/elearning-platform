@@ -10,6 +10,8 @@ import { TeacherApplication } from './pages/teacher-application/teacher-applicat
 import { TeacherPending } from './pages/teacher-pending/teacher-pending';
 import { AdminFormateurs } from './pages/admin-formateurs/admin-formateurs';
 import { Courses } from './pages/admin-cours/admin-cours';
+import { TeacherProfile } from './pages/teacher-profile/teacher-profile';
+import { AdminCoursDetail } from './pages/admin-cours-detail/admin-cours-detail';
 
 const routes: Routes = [
   { path: '',                  redirectTo: 'login', pathMatch: 'full' },
@@ -22,6 +24,9 @@ const routes: Routes = [
   { path: 'teacher-pending',   component: TeacherPending },
   { path: 'admin-formateurs',  component: AdminFormateurs },
   { path: 'admin-cours',       component: Courses },
+  { path: 'teacher-profile', component: TeacherProfile },
+  { path: 'admin/formations/:id', component: AdminCoursDetail },
+  
 ];
 
 @NgModule({

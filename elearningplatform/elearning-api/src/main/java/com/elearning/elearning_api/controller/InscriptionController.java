@@ -24,10 +24,12 @@ public class InscriptionController {
         return ResponseEntity.ok(inscriptionService.inscrire(request));
     }
 
+    // ← MODIFIÉ : FORMATEUR peut aussi accepter/refuser ses inscriptions
     @PatchMapping("/{id}/statut")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<InscriptionResponse> updateStatut(@PathVariable Long id,
-                                                            @RequestParam StatutInscription statut) {
+    @PreAuthorize("hasRole('ADMIN') or hasRole('FORMATEUR')")
+    public ResponseEntity<InscriptionResponse> updateStatut(
+            @PathVariable Long id,
+            @RequestParam StatutInscription statut) {
         return ResponseEntity.ok(inscriptionService.updateStatut(id, statut));
     }
 

@@ -65,6 +65,7 @@ public class LeconService {
         response.setTitre(lecon.getTitre());
         response.setDescription(lecon.getDescription());
         response.setOrdre(lecon.getOrdre());
+        response.setCoursId(lecon.getCours().getId()); 
         response.setCoursTitre(lecon.getCours().getTitre());
         return response;
     }

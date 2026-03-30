@@ -69,6 +69,7 @@ public class EvaluationService {
         response.setNoteMax(evaluation.getNoteMax());
         response.setNoteMin(evaluation.getNoteMin());
         response.setDateCreation(evaluation.getDateCreation());
+        response.setLeconId(evaluation.getLecon().getId());  
         response.setLeconTitre(evaluation.getLecon().getTitre());
         return response;
     }

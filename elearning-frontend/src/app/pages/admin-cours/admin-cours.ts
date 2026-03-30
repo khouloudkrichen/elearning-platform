@@ -1,4 +1,4 @@
-// cSpell:ignore formateur categorie statut publie retire valider publier retirer
+// cSpell:ignore formateur categorie BROUILLON ATTENTE VALIDATION SUPPRIME
 
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -32,7 +32,7 @@ export class Courses implements OnInit {
   // ── Modal Confirmation ────────────────────────────────
   showConfirm    = false;
   itemToAction:  Cours | null = null;
-  pendingAction: 'valider' | 'publier' | 'retirer' | 'supprimer' | '' = '';
+  pendingAction: 'publier' | 'supprimer' | '' = '';
 
   // ── Constructor ───────────────────────────────────────
   constructor(
@@ -41,8 +41,6 @@ export class Courses implements OnInit {
     private readonly router:          Router,
     private readonly cdr:             ChangeDetectorRef
   ) {}
-
-  // ── Lifecycle ─────────────────────────────────────────
 
   ngOnInit(): void {
     this.chargerCours();
@@ -90,7 +88,7 @@ export class Courses implements OnInit {
         || (item.categorieNom     ?? '').toLowerCase().includes(q)
         || (item.sousCategorieNom ?? '').toLowerCase().includes(q);
       const matchStatut = !this.filterStatut
-        || item.statut === (this.filterStatut as EtatCours);
+        || item.etatPublication === (this.filterStatut as EtatCours);
       const matchCat = !this.filterCategorie
         || String(item.categorieId) === this.filterCategorie;
       return matchSearch && matchStatut && matchCat;
@@ -106,12 +104,12 @@ export class Courses implements OnInit {
   // ── Stats ─────────────────────────────────────────────
 
   getCountByStatut(etat: EtatCours): number {
-    return this.listeCours.filter((item: Cours) => item.statut === etat).length;
+    return this.listeCours.filter((item: Cours) => item.etatPublication === etat).length;
   }
 
   // ── Confirmation & actions ────────────────────────────
 
-  confirmAction(item: Cours, action: typeof this.pendingAction): void {
+  confirmAction(item: Cours, action: 'publier' | 'supprimer'): void {
     this.itemToAction  = item;
     this.pendingAction = action;
     this.showConfirm   = true;
@@ -127,16 +125,14 @@ export class Courses implements OnInit {
   executeAction(): void {
     if (!this.itemToAction?.id || !this.pendingAction) return;
 
-    this.loading  = true;
-    const id      = this.itemToAction.id;
-    const action  = this.pendingAction;
+    this.loading = true;
+    const id     = this.itemToAction.id;
+    const action = this.pendingAction;
 
     let obs$: Observable<Cours | void>;
 
     switch (action) {
-      case 'valider':   obs$ = this.coursService.validerCours(id);   break;
       case 'publier':   obs$ = this.coursService.publierCours(id);   break;
-      case 'retirer':   obs$ = this.coursService.retirerCours(id);   break;
       case 'supprimer': obs$ = this.coursService.supprimerCours(id); break;
       default: return;
     }
@@ -146,13 +142,8 @@ export class Courses implements OnInit {
         if (action === 'supprimer') {
           this.listeCours = this.listeCours.filter((c: Cours) => c.id !== id);
         } else {
-          const statutMap: Record<string, EtatCours> = {
-            valider: 'VALIDE',
-            publier: 'PUBLIE',
-            retirer: 'RETIRE',
-          };
           const found = this.listeCours.find((c: Cours) => c.id === id);
-          if (found) found.statut = statutMap[action];
+          if (found) found.etatPublication = 'PUBLIE';
         }
         this.loading = false;
         this.closeConfirm();
@@ -174,22 +165,22 @@ export class Courses implements OnInit {
 
   // ── Helpers affichage ─────────────────────────────────
 
-  getStatutLabel(statut: EtatCours): string {
-    const labels: Record<EtatCours, string> = {
-      EN_ATTENTE: '⏳ En attente',
-      VALIDE:     '✅ Validé',
-      PUBLIE:     '● Publié',
-      RETIRE:     '🚫 Retiré',
+  getStatutLabel(statut: string): string {
+    const labels: Record<string, string> = {
+      BROUILLON:            '📝 Brouillon',
+      EN_ATTENTE_VALIDATION:'⏳ En attente',
+      PUBLIE:               '🌍 Publié',
+      SUPPRIME:             '🚫 Supprimé',
     };
     return labels[statut] ?? statut;
   }
 
-  getStatutCssClass(statut: EtatCours): string {
-    const classes: Record<EtatCours, string> = {
-      EN_ATTENTE: 'attente',
-      VALIDE:     'valide',
-      PUBLIE:     'publie',
-      RETIRE:     'retire',
+  getStatutCssClass(statut: string): string {
+    const classes: Record<string, string> = {
+      BROUILLON:             'brouillon',
+      EN_ATTENTE_VALIDATION: 'attente',
+      PUBLIE:                'publie',
+      SUPPRIME:              'supprime',
     };
     return classes[statut] ?? '';
   }
@@ -213,10 +204,10 @@ export class Courses implements OnInit {
   getBannerGradient(categorieId: number): string {
     const gradients: string[] = [
       'linear-gradient(135deg,#6366f1,#8b5cf6)',
-      'linear-gradient(135deg,#f59e0b,#f97316)',
-      'linear-gradient(135deg,#06b6d4,#0ea5e9)',
-      'linear-gradient(135deg,#10b981,#06b6d4)',
-      'linear-gradient(135deg,#ec4899,#8b5cf6)',
+      'linear-gradient(135deg,#8b5cf6,#6366f1)',
+      'linear-gradient(135deg,#4f46e5,#7c3aed)',
+      'linear-gradient(135deg,#7c3aed,#4f46e5)',
+      'linear-gradient(135deg,#6366f1,#4f46e5)',
     ];
     return gradients[(categorieId ?? 0) % gradients.length];
   }
@@ -225,16 +216,14 @@ export class Courses implements OnInit {
 
   getActionIcon(action: string): string {
     const icons: Record<string, string> = {
-      valider: '✅', publier: '🚀', retirer: '⏸️', supprimer: '🗑️'
+      publier: '🚀', supprimer: '🗑️'
     };
     return icons[action] ?? '❓';
   }
 
   getActionTitle(action: string): string {
     const titles: Record<string, string> = {
-      valider:   'Valider cette formation ?',
       publier:   'Publier cette formation ?',
-      retirer:   'Retirer cette formation ?',
       supprimer: 'Supprimer cette formation ?',
     };
     return titles[action] ?? '';
@@ -242,9 +231,7 @@ export class Courses implements OnInit {
 
   getActionVerb(action: string): string {
     const verbs: Record<string, string> = {
-      valider:   'valider',
       publier:   'publier',
-      retirer:   'retirer',
       supprimer: 'supprimer définitivement',
     };
     return verbs[action] ?? action;
@@ -252,9 +239,7 @@ export class Courses implements OnInit {
 
   getActionWarning(action: string): string {
     const warnings: Record<string, string> = {
-      valider:   'Le formateur sera notifié de la validation.',
       publier:   'La formation sera immédiatement visible par tous les étudiants.',
-      retirer:   "Les étudiants inscrits perdront l'accès.",
       supprimer: 'Toutes les données associées seront perdues.',
     };
     return warnings[action] ?? '';
@@ -262,9 +247,7 @@ export class Courses implements OnInit {
 
   getActionNote(action: string): string {
     const notes: Record<string, string> = {
-      valider:   '✦ La formation passera en statut "VALIDE"',
       publier:   '🚀 Accessible immédiatement aux étudiants',
-      retirer:   '⚠️ La formation sera masquée de la plateforme',
       supprimer: '⚠️ Action irréversible',
     };
     return notes[action] ?? '';
@@ -272,9 +255,7 @@ export class Courses implements OnInit {
 
   getActionLabel(action: string): string {
     const labels: Record<string, string> = {
-      valider:   '✅ Valider',
       publier:   '🚀 Publier',
-      retirer:   '⏸ Retirer',
       supprimer: '🗑 Supprimer',
     };
     return labels[action] ?? action;

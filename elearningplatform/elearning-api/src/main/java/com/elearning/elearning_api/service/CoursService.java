@@ -88,6 +88,7 @@ public class CoursService {
         return toResponse(coursRepository.save(existing));
     }
 
+    // ── toResponse — TOUS les champs peuplés ─────────────
     private CoursResponse toResponse(Cours cours) {
         CoursResponse response = new CoursResponse();
         response.setId(cours.getId());
@@ -96,8 +97,26 @@ public class CoursService {
         response.setEtatPublication(cours.getEtatPublication());
         response.setDateCreation(cours.getDateCreation());
         response.setDatePublication(cours.getDatePublication());
-        response.setFormateurNom(cours.getFormateur().getNom());
-        response.setSousCategorieNom(cours.getSousCategorie().getNom());
+
+        // ── Formateur ──────────────────────────────────────
+        if (cours.getFormateur() != null) {
+            response.setFormateurId(cours.getFormateur().getId());
+            response.setFormateurNom(cours.getFormateur().getNom());
+            response.setFormateurEmail(cours.getFormateur().getEmail());
+        }
+
+        // ── Sous-catégorie + Catégorie ─────────────────────
+        if (cours.getSousCategorie() != null) {
+            response.setSousCategorieId(cours.getSousCategorie().getId());
+            response.setSousCategorieNom(cours.getSousCategorie().getNom());
+
+            // Remonter à la catégorie parente
+            if (cours.getSousCategorie().getCategorie() != null) {
+                response.setCategorieId(cours.getSousCategorie().getCategorie().getId());
+                response.setCategorieNom(cours.getSousCategorie().getCategorie().getNom());
+            }
+        }
+
         return response;
     }
 }

@@ -31,7 +31,12 @@ import { AdminBloques }     from '../admin-bloques/admin-bloques';
 })
 export class Admin implements OnInit {
 
-  section: 'dashboard' | 'Formateurs' | 'etudiants' | 'blocked' | 'categories' | 'cours' = 'Formateurs';
+  section: 'dashboard' | 'Formateurs' | 'etudiants' | 'blocked' | 'categories' | 'cours' = 'dashboard';
+
+  nomAdmin      = localStorage.getItem('nom')   ?? 'Admin';
+  emailAdmin    = localStorage.getItem('email') ?? '';
+  initiales     = (localStorage.getItem('nom') ?? 'A')
+                    .trim().split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
   constructor(
     private readonly router: Router,
