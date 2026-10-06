@@ -1,0 +1,25 @@
+﻿# Angular / Node
+**/node_modules/
+**/dist/
+
+# Angular cache
+.angular/
+
+# IDE
+.vscode/
+.idea/
+
+# Java / Maven
+**/target/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Uploaded files
+**/uploads/
