@@ -1,112 +1,62 @@
-\# 🎓 E-Learning Platform
+# 🎓 Plateforme E-Learning
 
+Une plateforme d’apprentissage en ligne développée avec **Angular** et **Spring Boot**.
 
+## 📌 À propos du projet
 
-A full-stack e-learning platform developed with Angular and Spring Boot.
+Ce projet est une plateforme web d’apprentissage en ligne qui permet aux utilisateurs d’accéder aux contenus pédagogiques et de les gérer à travers une interface moderne et interactive.
 
+L’application propose des fonctionnalités dédiées aux **étudiants, enseignants et administrateurs**.
 
+## ✨ Fonctionnalités principales
 
-\## 📌 About the Project
+- 🔐 Authentification et inscription des utilisateurs
+- 👨‍🎓 Gestion des étudiants
+- 👨‍🏫 Gestion des enseignants
+- 📚 Gestion des cours
+- 📂 Gestion des catégories et sous-catégories
+- 📝 Gestion des quiz et des contenus pédagogiques
+- 🛠️ Tableau de bord d’administration
+- 💬 Fonctionnalités d’apprentissage interactives
+- 📄 API REST
+- 📁 Gestion du téléchargement et des fichiers
 
+## 🛠️ Technologies utilisées
 
+### Frontend
 
-This project is a web-based learning platform that allows users to access and manage educational content through a modern and interactive interface.
+- Angular
+- TypeScript
+- HTML / CSS / SCSS
+- Bootstrap
 
+### Backend
 
+- Java
+- Spring Boot
+- Spring Data JPA
+- Spring Security
+- REST API
+- Maven
 
-The application includes dedicated functionalities for students, teachers and administrators.
+### Base de données
 
+- MySQL
 
+### Outils
 
-\## ✨ Main Features
+- Git
+- GitHub
+- Swagger / OpenAPI
 
-
-
-\- 🔐 User authentication and registration
-
-\- 👨‍🎓 Student management
-
-\- 👨‍🏫 Teacher management
-
-\- 📚 Course management
-
-\- 📂 Categories and subcategories
-
-\- 📝 Quizzes and educational content
-
-\- 🛠️ Administration dashboard
-
-\- 💬 Interactive learning features
-
-\- 📄 REST API
-
-\- 📁 File upload management
-
-
-
-\## 🛠️ Technologies
-
-
-
-\### Frontend
-
-\- Angular
-
-\- TypeScript
-
-\- HTML / CSS / SCSS
-
-\- Bootstrap
-
-
-
-\### Backend
-
-\- Java
-
-\- Spring Boot
-
-\- Spring Data JPA
-
-\- Spring Security
-
-\- REST API
-
-\- Maven
-
-
-
-\### Database
-
-\- MySQL
-
-
-
-\### Tools
-
-\- Git
-
-\- GitHub
-
-\- Swagger / OpenAPI
-
-
-
-\## 📁 Project Structure
-
-
+## 📁 Structure du projet
 
 ```text
-
 elearning-platform/
 
 │
-
-├── elearning-frontend/       # Angular frontend
-
+├── elearning-frontend/       # Interface frontend Angular
 │
-
 └── elearningplatform/
-
-&#x20;   └── elearning-api/        # Spring Boot backend
-
+    └── elearning-api/        # Backend Spring Boot
+```
